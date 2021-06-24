@@ -8,6 +8,7 @@
 #include <windows.h>
 #endif
 
+#include <string>
 #include "cbase.h"
 
 class CLogicOpenUrl : public CLogicalEntity
@@ -23,6 +24,8 @@ public:
 
 private:
 	string_t m_strUrl;
+
+	void ExecuteUrl( std::string url, CBaseEntity *activator );
 
 	COutputEvent	m_OnOpenUrlSuccess;
 	COutputEvent	m_OnOpenUrlFailure;
@@ -47,12 +50,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CLogicOpenUrl::InputOpenUrl( inputdata_t &inputData )
 {
-	if((int)ShellExecute(NULL, "open", STRING(m_strUrl), NULL, NULL, SW_SHOWNORMAL)>32)
-	{
-		m_OnOpenUrlSuccess.FireOutput( inputData.pActivator, this );
-	} else {
-		m_OnOpenUrlFailure.FireOutput( inputData.pActivator, this );
-	}
+	ExecuteUrl( STRING(m_strUrl), inputData.pActivator );
 }
 
 //-----------------------------------------------------------------------------
@@ -60,10 +58,24 @@ void CLogicOpenUrl::InputOpenUrl( inputdata_t &inputData )
 //-----------------------------------------------------------------------------
 void CLogicOpenUrl::InputOpenUrlByName( inputdata_t &inputData )
 {
-	if((int)ShellExecute(NULL, "open", inputData.value.String(), NULL, NULL, SW_SHOWNORMAL)>32)
+	ExecuteUrl( inputData.value.String(), inputData.pActivator );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Internal method to avoid repeating code in input functions
+//-----------------------------------------------------------------------------
+void CLogicOpenUrl::ExecuteUrl( std::string url, CBaseEntity *activator )
+{
+	if( url != "about:blank" && url.substr(0,8) != "https://" && url.substr(0,7) != "http://" )
 	{
-		m_OnOpenUrlSuccess.FireOutput( inputData.pActivator, this );
+		// force https prefix to prevent arbitrary file execution on client disk with ShellExecute
+		url = "https://" + url;
+	}
+	
+	if( (int)ShellExecute( NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL ) > 32 )
+	{
+		m_OnOpenUrlSuccess.FireOutput( activator, this );
 	} else {
-		m_OnOpenUrlFailure.FireOutput( inputData.pActivator, this );
+		m_OnOpenUrlFailure.FireOutput( activator, this );
 	}
 }
