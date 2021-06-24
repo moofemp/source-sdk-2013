@@ -2621,6 +2621,9 @@ bool CScriptConvarAccessor::Init()
 
 	AddOverridable( "save" );
 	AddOverridable( "load" );
+	
+	AddOverridable( "disconnect" );
+	AddOverridable( "sv_cheats" );
 
 
 	AddBlockedConVar( "con_enable" );
