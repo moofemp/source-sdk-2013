@@ -48,7 +48,8 @@ BEGIN_DATADESC( CLogicOpenUrl )
 END_DATADESC()
 
 //-----------------------------------------------------------------------------
-// Purpose: Open keyvalue-stored URL, return based on whether it was successful
+// Purpose: Open keyvalue-stored URL
+// Output: Whether the open succeeded
 //-----------------------------------------------------------------------------
 void CLogicOpenUrl::InputOpenUrl( inputdata_t &inputData )
 {
@@ -56,7 +57,8 @@ void CLogicOpenUrl::InputOpenUrl( inputdata_t &inputData )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Open parameter URL, return based on whether it was successful
+// Purpose: Open parameter URL
+// Output: Whether the open succeeded
 //-----------------------------------------------------------------------------
 void CLogicOpenUrl::InputOpenUrlByName( inputdata_t &inputData )
 {
