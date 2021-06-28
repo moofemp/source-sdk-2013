@@ -70,7 +70,7 @@ void CLogicOpenUrl::InputOpenUrlByName( inputdata_t &inputData )
 //-----------------------------------------------------------------------------
 void CLogicOpenUrl::ExecuteUrl( std::string url, CBaseEntity *activator )
 {
-	if( url != "about:blank" && url.substr(0,8) != "https://" && url.substr(0,7) != "http://" )
+	if( url.substr(0,8) != "https://" && url.substr(0,7) != "http://" )
 	{
 		// force https prefix to prevent arbitrary file execution on client disk with ShellExecute
 		url = "https://" + url;
