@@ -21,6 +21,7 @@ public:
 
 	void InputOpenUrl( inputdata_t &inputData );
 	void InputOpenUrlByName( inputdata_t &inputData );
+	void InputSetUrl( inputdata_t &inputData );
 
 private:
 	string_t m_strUrl;
@@ -39,6 +40,7 @@ BEGIN_DATADESC( CLogicOpenUrl )
 
 	DEFINE_INPUTFUNC( FIELD_VOID, "OpenUrl", InputOpenUrl ),
 	DEFINE_INPUTFUNC( FIELD_STRING, "OpenUrlByName", InputOpenUrlByName ),
+	DEFINE_INPUTFUNC( FIELD_STRING, "SetUrl", InputSetUrl ),
 
 	DEFINE_OUTPUT( m_OnOpenUrlSuccess, "OnOpenUrlSuccess" ),
 	DEFINE_OUTPUT( m_OnOpenUrlFailure, "OnOpenUrlFailure" ),
@@ -78,4 +80,12 @@ void CLogicOpenUrl::ExecuteUrl( std::string url, CBaseEntity *activator )
 	} else {
 		m_OnOpenUrlFailure.FireOutput( activator, this );
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Setter method for URL keyvalue
+//-----------------------------------------------------------------------------
+void CLogicOpenUrl::InputSetUrl( inputdata_t &inputData )
+{
+	m_strUrl = inputData.value.StringID();
 }
