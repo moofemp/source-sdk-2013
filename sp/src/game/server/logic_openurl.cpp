@@ -11,6 +11,8 @@
 #include <string>
 #include "cbase.h"
 
+#define SF_OPENURL_START_DISABLED (1 << 0)
+
 class CLogicOpenUrl : public CLogicalEntity
 {
 public:
@@ -19,12 +21,18 @@ public:
 
 	CLogicOpenUrl( void ) { }
 
+	void InputDisable( inputdata_t &inputData );
+	void InputEnable( inputdata_t &inputData );
 	void InputOpenUrl( inputdata_t &inputData );
 	void InputOpenUrlByName( inputdata_t &inputData );
 	void InputSetUrl( inputdata_t &inputData );
+	
+	void Spawn(void);
 
 private:
 	string_t m_strUrl;
+
+	bool m_bEnabled;
 
 	void ExecuteUrl( std::string url, CBaseEntity *activator );
 
@@ -36,8 +44,12 @@ LINK_ENTITY_TO_CLASS( logic_openurl, CLogicOpenUrl );
 
 BEGIN_DATADESC( CLogicOpenUrl )
 	
+	DEFINE_FIELD( m_bEnabled, FIELD_BOOLEAN ),
+
 	DEFINE_KEYFIELD( m_strUrl, FIELD_STRING, "url" ),
 
+	DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
+	DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "OpenUrl", InputOpenUrl ),
 	DEFINE_INPUTFUNC( FIELD_STRING, "OpenUrlByName", InputOpenUrlByName ),
 	DEFINE_INPUTFUNC( FIELD_STRING, "SetUrl", InputSetUrl ),
@@ -48,11 +60,19 @@ BEGIN_DATADESC( CLogicOpenUrl )
 END_DATADESC()
 
 //-----------------------------------------------------------------------------
+// Purpose: Disable or enable the entity (disabling prevents any input functions from running)
+//-----------------------------------------------------------------------------
+void CLogicOpenUrl::InputDisable( inputdata_t &inputData ) { m_bEnabled = false; }
+void CLogicOpenUrl::InputEnable ( inputdata_t &inputData ) { m_bEnabled = true ; }
+
+//-----------------------------------------------------------------------------
 // Purpose: Open keyvalue-stored URL
 // Output: Whether the open succeeded
 //-----------------------------------------------------------------------------
 void CLogicOpenUrl::InputOpenUrl( inputdata_t &inputData )
 {
+	if( !m_bEnabled ) return;
+
 	ExecuteUrl( STRING(m_strUrl), inputData.pActivator );
 }
 
@@ -62,6 +82,8 @@ void CLogicOpenUrl::InputOpenUrl( inputdata_t &inputData )
 //-----------------------------------------------------------------------------
 void CLogicOpenUrl::InputOpenUrlByName( inputdata_t &inputData )
 {
+	if( !m_bEnabled ) return;
+
 	ExecuteUrl( inputData.value.String(), inputData.pActivator );
 }
 
@@ -89,5 +111,15 @@ void CLogicOpenUrl::ExecuteUrl( std::string url, CBaseEntity *activator )
 //-----------------------------------------------------------------------------
 void CLogicOpenUrl::InputSetUrl( inputdata_t &inputData )
 {
+	if( !m_bEnabled ) return;
+	
 	m_strUrl = inputData.value.StringID();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Respond to spawnflags when entity spawns
+//-----------------------------------------------------------------------------
+void CLogicOpenUrl::Spawn( void )
+{
+	m_bEnabled = !HasSpawnFlags( SF_OPENURL_START_DISABLED );
 }
